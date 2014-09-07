@@ -501,6 +501,15 @@ var fieldRequired = '{l s='Please fill in all the required fields before saving 
 {/if}
 {if isset($HOOK_PRODUCT_FOOTER) && $HOOK_PRODUCT_FOOTER}{$HOOK_PRODUCT_FOOTER}{/if}
 
+	{assign var="hide" value="0"}
+			{foreach from=$groups key=id_attribute_group item=group}
+			{if $group.name="Hide Customize"}
+				{foreach from=$group.attributes key=id_attribute item=group_attribute}
+					{$hide="1"}
+				{/foreach}
+			{/if}
+	{/foreach}
+
 <!-- description and features -->
 {if (isset($product) && $product->description) || (isset($features) && $features) || (isset($accessories) && $accessories) || (isset($HOOK_PRODUCT_TAB) && $HOOK_PRODUCT_TAB) || (isset($attachments) && $attachments) || isset($product) && $product->customizable}
 <div id="more_info_block" class="clear">
@@ -509,7 +518,7 @@ var fieldRequired = '{l s='Please fill in all the required fields before saving 
 		{if $features}<li><a id="more_info_tab_data_sheet" href="#idTab2">{l s='Data sheet'}</a></li>{/if}
 		{if $attachments}<li><a id="more_info_tab_attachments" href="#idTab9">{l s='Download'}</a></li>{/if}
 		{if isset($accessories) AND $accessories}<li><a href="#idTab4">{l s='Accessories'}</a></li>{/if}
-		{if isset($product) && $product->customizable}<li><a href="#idTab10">{l s='Product customization'}</a></li>{/if}
+		{if isset($product) && $product->customizable && $hide=="0"}<li><a href="#idTab10">{l s='Product customization'}</a></li>{/if}
 		{$HOOK_PRODUCT_TAB}
 	</ul>
 	<div id="more_info_sheets" class="sheets align_justify">
@@ -572,8 +581,10 @@ var fieldRequired = '{l s='Please fill in all the required fields before saving 
 		</div>
 	{/if}
 
+
 	<!-- Customizable products -->
-	{if isset($product) && $product->customizable}
+	{if isset($product) && $product->customizable && $hide=="0"}
+
 		<div id="idTab10" class="bullet customization_block">
 			<form method="post" action="{$customizationFormTarget}" enctype="multipart/form-data" id="customizationForm" class="clearfix">
 				<p class="infoCustomizable">
