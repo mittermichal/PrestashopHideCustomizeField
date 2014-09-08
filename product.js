@@ -724,3 +724,16 @@ function checkUrl()
 		}
 	}
 }
+
+function toggleCustomize(id,load){
+	value = $('#'+id).val();
+	if (value == 22) {
+			$('.hideCustomizeTab').hide();
+			if (load) $('.hideCustomizeField').hide();
+	}
+	else {
+		$('.hideCustomizeTab').show();
+		if (load) $('.hideCustomizeField').show();
+	}
+
+}

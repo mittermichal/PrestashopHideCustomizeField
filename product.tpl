@@ -276,8 +276,29 @@ var fieldRequired = '{l s='Please fill in all the required fields before saving 
 				<input type="hidden" name="id_product_attribute" id="idCombination" value="" />
 			</p>
 
+
+
 			<div class="product_attributes">
+			{assign var="hide" value="0"}
+			{assign var="hide_attribute_name" value="Hide Customize"}
 				{if isset($groups)}
+					{foreach from=$groups key=id_attribute_group item=group}
+						{if $group.name==$hide_attribute_name}
+							{$hide="1"}
+							{$groupId=$id_attribute_group}
+							{*foreach from=$group.attributes key=id_attribute item=group_attribute}
+							{/foreach*}
+						{/if}
+					{/foreach}
+				{if $hide=="1"}
+				{literal}
+				<script type="text/javascript">
+					$(function() {
+					    toggleCustomize('group_{/literal}{$id_attribute_group}{literal}',true);
+					});
+				</script>
+				{/literal}
+				{/if}
 				<!-- attributes -->
 				<div id="attributes">
 				<div class="clear"></div>
@@ -288,7 +309,7 @@ var fieldRequired = '{l s='Please fill in all the required fields before saving 
 							{assign var="groupName" value="group_$id_attribute_group"}
 							<div class="attribute_list">
 							{if ($group.group_type == 'select')}
-								<select name="{$groupName}" id="group_{$id_attribute_group|intval}" class="attribute_select" onchange="findCombination();getProductAttribute();">
+								<select name="{$groupName}" id="group_{$id_attribute_group|intval}" class="attribute_select" onchange="findCombination();getProductAttribute();{if $group.name==$hide_attribute_name}toggleCustomize('group_{$id_attribute_group|intval}',false);{/if}">
 									{foreach from=$group.attributes key=id_attribute item=group_attribute}
 										<option value="{$id_attribute|intval}"{if (isset($smarty.get.$groupName) && $smarty.get.$groupName|intval == $id_attribute) || $group.default == $id_attribute} selected="selected"{/if} title="{$group_attribute|escape:'htmlall':'UTF-8'}">{$group_attribute|escape:'htmlall':'UTF-8'}</option>
 									{/foreach}
@@ -501,15 +522,6 @@ var fieldRequired = '{l s='Please fill in all the required fields before saving 
 {/if}
 {if isset($HOOK_PRODUCT_FOOTER) && $HOOK_PRODUCT_FOOTER}{$HOOK_PRODUCT_FOOTER}{/if}
 
-	{assign var="hide" value="0"}
-			{foreach from=$groups key=id_attribute_group item=group}
-			{if $group.name="Hide Customize"}
-				{foreach from=$group.attributes key=id_attribute item=group_attribute}
-					{$hide="1"}
-				{/foreach}
-			{/if}
-	{/foreach}
-
 <!-- description and features -->
 {if (isset($product) && $product->description) || (isset($features) && $features) || (isset($accessories) && $accessories) || (isset($HOOK_PRODUCT_TAB) && $HOOK_PRODUCT_TAB) || (isset($attachments) && $attachments) || isset($product) && $product->customizable}
 <div id="more_info_block" class="clear">
@@ -518,7 +530,7 @@ var fieldRequired = '{l s='Please fill in all the required fields before saving 
 		{if $features}<li><a id="more_info_tab_data_sheet" href="#idTab2">{l s='Data sheet'}</a></li>{/if}
 		{if $attachments}<li><a id="more_info_tab_attachments" href="#idTab9">{l s='Download'}</a></li>{/if}
 		{if isset($accessories) AND $accessories}<li><a href="#idTab4">{l s='Accessories'}</a></li>{/if}
-		{if isset($product) && $product->customizable && $hide=="0"}<li><a href="#idTab10">{l s='Product customization'}</a></li>{/if}
+		{if isset($product) && $product->customizable}<li{if ($hide=="1")} class="hideCustomizeTab"{/if}><a href="#idTab10">{l s='Product customization'}</a></li>{/if}
 		{$HOOK_PRODUCT_TAB}
 	</ul>
 	<div id="more_info_sheets" class="sheets align_justify">
@@ -583,9 +595,9 @@ var fieldRequired = '{l s='Please fill in all the required fields before saving 
 
 
 	<!-- Customizable products -->
-	{if isset($product) && $product->customizable && $hide=="0"}
+	{if isset($product) && $product->customizable}
 
-		<div id="idTab10" class="bullet customization_block">
+		<div id="idTab10" class="bullet customization_block{if ($hide=='1')} hideCustomizeField{/if}">
 			<form method="post" action="{$customizationFormTarget}" enctype="multipart/form-data" id="customizationForm" class="clearfix">
 				<p class="infoCustomizable">
 					{l s='After saving your customized product, remember to add it to your cart.'}
